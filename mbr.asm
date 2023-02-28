@@ -54,7 +54,7 @@ start:
     ;IDFK
     jmp 0x0000:0x7C00
 
-message db 'This is the Dig Bick Boot Loader', 0
+message db 'This is the Project Boot Loader', 0
 
 
 BOOT_DRIVE db 0
