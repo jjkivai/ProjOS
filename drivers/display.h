@@ -1,11 +1,15 @@
-#define VGA_CTRL_REGISTER 0x3d4
-#define VGA_DATA_REGISTER 0x3d5
-#define VGA_OFFSET_LOW 0x0f
-#define VGA_OFFSET_HIGH 0x0e
+#ifndef DISPLAY_H
+#define DISPLAY_H
+#pragma once
+#include <stdint.h>
+#define VGA_CTRL_REGISTER 0x3D4
+#define VGA_DATA_REGISTER 0x3D5
+#define VGA_OFFSET_LOW 0x0F
+#define VGA_OFFSET_HIGH 0x0E
 #define MAX_ROWS 25
 #define MAX_COLS 80
 #define WHITE_ON_BLACK 0x07
-#define VIDEO_ADDRESS 0xb8000
+#define VIDEO_ADDRESS 0xB8000
 
 unsigned char port_byte_in(unsigned short port)
 {
@@ -80,12 +84,13 @@ int scroll_ln(int offset)
 
     return offset - 2 * MAX_COLS;
 }
-void print_string(char *string)
+void print_string(const char *string)
 {
     int offset = get_cursor();
     int i = 0;
     while (string[i] != 0)
     {
+        char v = string[i];
         if (offset >= MAX_ROWS * MAX_COLS * 2)
         {
             offset = scroll_ln(offset);
@@ -96,7 +101,7 @@ void print_string(char *string)
         }
         else
         {
-            set_char_at_video_memory(string[i], offset);
+            set_char_at_video_memory(v, offset);
             offset += 2;
         }
         i++;
@@ -111,16 +116,20 @@ void clear_screen()
     }
     set_cursor(get_offset(0, 0));
 }
-void clear_screen2(const char *message)
+void print_backspace()
 {
-    for (int i = 0; i < 5; ++i)
-    {
-        char text = message[i];
-        set_char_at_video_memory(text, i * 2);
-    }
-    set_cursor(get_offset(0, 0));
+    int newCursor = get_cursor() - 2;
+    set_char_at_video_memory(' ', newCursor);
+    set_cursor(newCursor);
 }
-// void lol()
-// {
-//     printf("lol");
-// }
+void print_nl()
+{
+    int newOffset = move_offset_to_new_line(get_cursor());
+    if (newOffset >= MAX_ROWS * MAX_COLS * 2)
+    {
+        newOffset = scroll_ln(newOffset);
+    }
+    set_cursor(newOffset);
+}
+
+#endif

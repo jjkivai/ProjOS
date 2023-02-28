@@ -1,5 +1,7 @@
 [BITS 16]
 [ORG 0x7C00]
+; where kernel will go
+KERNEL_OFFSET equ 0x1000
 
 jmp start
 
@@ -21,8 +23,6 @@ print_string:
 start:
     mov si, message
     call print_string
-    ; where kernel will go
-    KERNEL_OFFSET equ 0x1000
     ; BIOS sets boot drive
     mov [BOOT_DRIVE], dl
     ; setup stack
@@ -61,7 +61,7 @@ BOOT_DRIVE db 0
 [BITS 16]
 load_kernel:
     mov bx, KERNEL_OFFSET;
-    mov dh, 2
+    mov dh, 31
     mov dl, [BOOT_DRIVE]
     call disk_load
     ret
@@ -71,7 +71,7 @@ BEGIN_32BIT:
     call KERNEL_OFFSET
     jmp $;
 
-; BOOT_DRIVE VAR
+
 
 
 

@@ -1,7 +1,7 @@
 [BITS 16]
 switch_to_32bit:
     cli                     ; 1. disable interrupts
-    lgdt [gdt_descriptor]   ; 2. load GDT descriptor
+    lgdt [gdt_descriptor]   ; 2. load GDT descriptor 
     mov eax, cr0
     or eax, 0x1             ; 3. enable protected mode
     mov cr0, eax

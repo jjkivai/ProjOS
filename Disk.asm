@@ -23,6 +23,7 @@ disk_load:
     ret
 
 disk_error:
+    mov dh, ah
     jmp disk_loop
 
 sectors_error:
