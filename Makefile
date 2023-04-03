@@ -1,48 +1,61 @@
-# $@ = target file
-# $< = first dependency
-# $^ = all dependencies
-
-# detect all .o files based on their .c source
-C_SOURCES = $(wildcard *.c drivers/*.c cpu/*.c)
-HEADERS = $(wildcard *.h  drivers/*.h cpu/*.h)
-OBJ_FILES = ${C_SOURCES:.c=.o cpu/interrupt.o}
-
-# First rule is the one executed when no parameters are fed to the Makefile
-all: run
-
-# Notice how dependencies are built as needed
-kernel.bin: kernel-entry.o ${OBJ_FILES}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^ --oformat binary
-
-os-image.bin: mbr.bin kernel.bin
-	cat $^ > $@
-
-run: os-image.bin
-	qemu-system-i386 -fda $<
-
-echo: os-image.bin
-	xxd $<
-
-# only for debug
-kernel.elf: boot/kernel_entry.o ${OBJ_FILES}
-	ld -m elf_i386 -o $@ -Ttext 0x1000 $^
+ASM=nasm
+CC=gcc
 
 
-%.o: %.c ${HEADERS}
-	gcc -m32 -ffreestanding -fno-pie -c $< -o $@ # -g for debugging
+TOOLS_DIR=tools
+BUILD_DIR=build
 
-%.o: %.asm
-	nasm $< -f elf -o $@
+.PHONY: all floppy_image kernel bootloader clean always fat
 
-%.bin: %.asm
-	nasm $< -f bin -o $@
+all: floppy_image fat
 
-%.dis: %.bin
-	ndisasm -b 32 $< > $@
+#
+# Floppy image
+#
+floppy_image: $(BUILD_DIR)/os_image.img
 
+$(BUILD_DIR)/os_image.img: bootloader kernel
+	dd if=/dev/zero of=$(BUILD_DIR)/os_image.img bs=512 count=2880
+	mkfs.fat -F 12 -n "PROJECTOS" $(BUILD_DIR)/os_image.img
+	dd if=$(BUILD_DIR)/MBR.bin of=$(BUILD_DIR)/os_image.img conv=notrunc
+	mcopy -i $(BUILD_DIR)/os_image.img $(BUILD_DIR)/kernel.bin "::kernel.bin"
+
+#
+# Bootloader
+#
+bootloader: $(BUILD_DIR)/MBR.bin
+
+$(BUILD_DIR)/MBR.bin: always
+	$(ASM) boot/MBR.asm -f bin -o $(BUILD_DIR)/MBR.bin
+
+#
+# Kernel
+#
+kernel: $(BUILD_DIR)/kernel.bin
+
+$(BUILD_DIR)/kernel.bin: always
+	$(ASM) kernel/main.asm -f bin -o $(BUILD_DIR)/kernel.bin
+
+#
+# Tools
+#
+fat: $(BUILD_DIR)/FAT/fat
+$(BUILD_DIR)/FAT/fat: always FAT/fat.c
+	mkdir -p $(BUILD_DIR)/tools
+	$(CC) -g -o $(BUILD_DIR)/tools/fat FAT/fat.c
+
+#
+# Always
+#
+always:
+	mkdir -p $(BUILD_DIR)
+
+#
+# Clean
+#
 clean:
-	$(RM) *.bin *.o *.dis *.elf
-	$(RM) kernel/*.o
-	$(RM) boot/*.o boot/*.bin
-	$(RM) drivers/*.o
-	$(RM) cpu/*.o
+	rm -rf $(BUILD_DIR)/*
+	rm -rf */*.bin
+	rm -rf */*.img
+	rm -rf */*.o
+	rm -rf *.bin
