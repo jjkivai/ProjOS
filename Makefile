@@ -1,40 +1,41 @@
-ASM=nasm
-CC=gcc
+BUILD_DIR = $(abspath build)
 
 
-TOOLS_DIR=tools
-BUILD_DIR=build
+.PHONY: all os_image kernel bootloader clean always fat
 
-.PHONY: all floppy_image kernel bootloader clean always fat
+all: os_image fat
 
-all: floppy_image fat
-
-#
-# Floppy image
-#
-floppy_image: $(BUILD_DIR)/os_image.img
+os_image: $(BUILD_DIR)/os_image.img
+	qemu-system-i386 -drive format=raw,file=$<,index=0,if=floppy
 
 $(BUILD_DIR)/os_image.img: bootloader kernel
 	dd if=/dev/zero of=$(BUILD_DIR)/os_image.img bs=512 count=2880
 	mkfs.fat -F 12 -n "PROJECTOS" $(BUILD_DIR)/os_image.img
-	dd if=$(BUILD_DIR)/MBR.bin of=$(BUILD_DIR)/os_image.img conv=notrunc
+	dd if=$(BUILD_DIR)/record.bin of=$(BUILD_DIR)/os_image.img conv=notrunc
+	# cat $(BUILD_DIR)/sector.bin $(BUILD_DIR)/kernel.bin > $@
+	mcopy -i $(BUILD_DIR)/os_image.img $(BUILD_DIR)/sector.bin "::sector.bin"
 	mcopy -i $(BUILD_DIR)/os_image.img $(BUILD_DIR)/kernel.bin "::kernel.bin"
 
-#
-# Bootloader
-#
-bootloader: $(BUILD_DIR)/MBR.bin
+bootloader: record sector
 
-$(BUILD_DIR)/MBR.bin: always
-	$(ASM) boot/MBR.asm -f bin -o $(BUILD_DIR)/MBR.bin
+record: $(BUILD_DIR)/record.bin
 
-#
-# Kernel
-#
+$(BUILD_DIR)/record.bin: always
+	@echo "--> Compiled record"
+	@$(MAKE) -C record BUILD_DIR=$(abspath $(BUILD_DIR))
+
+
+sector: $(BUILD_DIR)/sector.bin
+
+$(BUILD_DIR)/sector.bin: always 
+	@echo "--> Compiled sector"
+	@$(MAKE) -C sector BUILD_DIR=$(abspath $(BUILD_DIR))
+
 kernel: $(BUILD_DIR)/kernel.bin
 
 $(BUILD_DIR)/kernel.bin: always
-	$(ASM) kernel/main.asm -f bin -o $(BUILD_DIR)/kernel.bin
+	@$(MAKE) -C kernel BUILD_DIR=$(abspath $(BUILD_DIR))
+
 
 #
 # Tools
@@ -50,12 +51,8 @@ $(BUILD_DIR)/FAT/fat: always FAT/fat.c
 always:
 	mkdir -p $(BUILD_DIR)
 
-#
-# Clean
-#
 clean:
+	$(MAKE) -C record clean BUILD_DIR=$(abspath $(BUILD_DIR))
+	$(MAKE) -C sector clean BUILD_DIR=$(abspath $(BUILD_DIR))
+	$(MAKE) -C kernel clean BUILD_DIR=$(abspath $(BUILD_DIR))
 	rm -rf $(BUILD_DIR)/*
-	rm -rf */*.bin
-	rm -rf */*.img
-	rm -rf */*.o
-	rm -rf *.bin

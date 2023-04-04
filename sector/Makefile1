@@ -1,0 +1,36 @@
+BUILD_DIR?= build
+ASM?= nasm
+ASM_FLAGS?= -f elf
+CC?= gcc
+CCFLAGS?= -ffreestanding -nostdlib
+LD?= ld
+LDFLAGS?=  -m elf_i386 -Ttext 0x1000  --oformat binary -T linker.ld
+
+
+C_SOURCES = $(wildcard *.cpp)
+HEADERS = $(wildcard *.h)
+ASM_SOURCES = $(wildcard *.asm)
+
+C_OBJECTS = $(patsubst %.cpp, $(BUILD_DIR)/%.obj, $(C_SOURCES))
+ASM_OBJECTS = $(patsubst %.asm, $(BUILD_DIR)/%.obj, $(ASM_SOURCES))
+
+
+.PHONY: all sector clean always
+
+all: sector
+
+sector: $(BUILD_DIR)/sector.bin
+
+$(BUILD_DIR)/sector.bin: $(C_OBJECTS) $(ASM_OBJECTS)
+	@echo "--> Compiled: " $<
+	@$(LD) $(LDFLAGS) -o $@ $^
+
+$(BUILD_DIR)/%.obj: %.cpp $(HEADERS)
+	@$(CC) -c $(CCFLAGS)  $< -o $@
+
+$(BUILD_DIR)/%.obj: %.asm
+	@$(ASM) $(ASM_FLAGS) $< -o $@
+	@echo "--> Compiled: " $<
+
+clean:
+	@rm -rf $(BUILD_DIR)/sector.bin
