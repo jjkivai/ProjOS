@@ -56,6 +56,7 @@ entry:
         xor edx, edx
         mov dl, [g_BootDrive]
         push edx
+
         call start
 
         cli
@@ -72,7 +73,7 @@ LoadGDT:
     lgdt [g_GDTDesc]
     ret
 
-msg_hello: db 'Hello world from ENTRY!', 0
 g_BootDrive: db 0
 g_BootPartitionSegment: dw 0
 g_BootPartitionOffset: dw 0
+

@@ -55,4 +55,5 @@ clean:
 	$(MAKE) -C record clean BUILD_DIR=$(abspath $(BUILD_DIR))
 	$(MAKE) -C sector clean BUILD_DIR=$(abspath $(BUILD_DIR))
 	$(MAKE) -C kernel clean BUILD_DIR=$(abspath $(BUILD_DIR))
+	$(MAKE) -C drivers clean
 	rm -rf $(BUILD_DIR)/*

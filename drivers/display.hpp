@@ -12,7 +12,7 @@
 #define VGA_SCREEN_DATA 0x3D5 // VGA screen data port
 
 // Display class
-
+extern "C" {
 class Display {
     private:
         /* Get location of cursor*/
@@ -27,17 +27,38 @@ class Display {
         int move_offset_to_new_line(int offset);
         /* Print each character on the line above */
         int scroll_up(int offset);
+        /* Convert number to string*/
+        void number_to_string(uint32_t number, int radix) {
+            char buffer[32];
+            // Wok on printing hex numbers
+            int pos=0, sign;
+            if ((sign = number) < 0) number = -number;
+            do {
+                buffer[pos++] = number % radix + '0';
+            } while((number /= radix) > 0);
+
+            // Print in reverse order
+            if (sign < 0) buffer[pos++] = '-';
+            while(pos > 0) {
+                print_char(buffer[--pos]);
+            }
+        }
     public:
-        /* Print string to screen */
-        void print(const char *character);
-        /* Print number to screen */
-        void print(int number);
+        /* Print a string*/
+        void print_string(const char *string, ...);
+        /* Print string only */
+        void print_string_s(const char *string);
+        /* print buffer*/
+        void print_buffer(const char *string, const void *buffer, int size);
+        /* Print a character */
+        void print_char(char character);
         /* Print a new line*/
         void print_newline();
         /* Clear screen */
-        void clear();
+        void clear_screen();
         /* Print backspace */
         void backspace();
         /* Print error */
         void print_error(const char *error);
 };
+}
