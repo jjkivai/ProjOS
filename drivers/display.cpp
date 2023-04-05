@@ -122,13 +122,13 @@ extern "C" {
                             {
                             case LENGTH_SHORT_SHORT:
                             case LENGTH_SHORT:
-                            case LENGTH_DEFAULT:     number_to_string(va_arg(args, int), radix);
+                            case LENGTH_DEFAULT:     print_number(va_arg(args, int), radix);
                                                             break;
 
-                            case LENGTH_LONG:        number_to_string(va_arg(args, long), radix);
+                            case LENGTH_LONG:        print_number(va_arg(args, long), radix);
                                                             break;
 
-                            case LENGTH_LONG_LONG:   number_to_string(va_arg(args, long long), radix);
+                            case LENGTH_LONG_LONG:   print_number(va_arg(args, long long), radix);
                                                             break;
                             }
                         }
@@ -138,13 +138,13 @@ extern "C" {
                             {
                             case LENGTH_SHORT_SHORT:
                             case LENGTH_SHORT:
-                            case LENGTH_DEFAULT:     number_to_string(va_arg(args, unsigned int), radix);
+                            case LENGTH_DEFAULT:     print_number(va_arg(args, unsigned int), radix);
                                                             break;
                                                             
-                            case LENGTH_LONG:        number_to_string(va_arg(args, unsigned  long), radix);
+                            case LENGTH_LONG:        print_number(va_arg(args, unsigned  long), radix);
                                                             break;
 
-                            case LENGTH_LONG_LONG:   number_to_string(va_arg(args, unsigned  long long), radix);
+                            case LENGTH_LONG_LONG:   print_number(va_arg(args, unsigned  long long), radix);
                                                             break;
                             }
                         }
@@ -165,23 +165,50 @@ extern "C" {
     }
     /* Print string only */
     void Display::print_string_s(const char *string) {
-
+        while (*string)
+        {
+            print_char(*string);
+            string++;
+        }
     }
     /* print buffer*/
     void Display::print_buffer(const char *string, const void *buffer, int size) {
         const uint8_t *buf = (const uint8_t*)buffer;
         print_string_s(string);
+        print_string_s("0x");
         for (int i = 0; i < size; i++)
         {
-            print_string_s("0x");
-            number_to_string(buf[i], 16);
-            print_string_s(" ");
+            print_number((buf[i] >> 4), 16);
+            print_number((buf[i]&0xF), 16);
         }
         print_newline();
     }
     /* Print a character */
     void Display::print_char(char character) {
-
+        switch(character) {
+            case '\n':
+                offset_x = 0;
+                offset_y++;
+                break;
+            case '\t':
+                for(int i = 0; i < 4 - (offset_x%4); i++) {
+                    print_char(' ');
+                }
+                break;
+            default:
+                set_char_at_video_memory(character, offset_x, offset_y);
+                offset_x++;
+                break;
+        }
+        if(offset_x >= MAX_COLS) {
+            offset_x = 0;
+            offset_y++;
+        }
+        if(offset_y >= MAX_ROWS) {
+            scroll_up(1);
+            offset_y = MAX_ROWS - 1;
+        }
+        set_cursor_offset(offset_x, offset_y);
     }
     /* Print a new line*/
     void Display::print_newline(){
@@ -189,14 +216,21 @@ extern "C" {
     }
     /* Clear screen */
     void Display::clear_screen(){
-
+        for(int i = 0; i < MAX_ROWS; i++) {
+            for(int j = 0; j < MAX_COLS; j++) {
+                set_char_at_video_memory('\0', j, i);
+            }
+        }
+        offset_x = 0;
+        offset_y = 0;
+        set_cursor_offset(offset_x, offset_y);
     }
     /* Print backspace */
     void Display::backspace() {
-
+        int newCursor = get_cursor_offset() - 2;
+        set_char_at_video_memory(' ', newCursor);
+        set_cursor_offset(newCursor);
+        offset_x--;
     }
-    /* Print error */
-    void Display::print_error(const char *error) {
 
-    }
 }
