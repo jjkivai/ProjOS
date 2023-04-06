@@ -18,12 +18,12 @@ all: run
 run: $(BUILD_DIR)/sector.bin
 
 $(BUILD_DIR)/sector.bin: $(C_OBJECTS) $(ASM_OBJECTS)
-	ld -m elf_i386 -Ttext 0x1000  --oformat binary -T linker.ld -o $@ $^ -Map $(BUILD_DIR)/sector.map
+	ld -m elf_i386 -Ttext 0x1000  --oformat binary -T linker.ld -o $@ $^ -Map $(BUILD_DIR)/sector.map 
 	# gcc -T linker.ld -nostdlib -Wl,-Map=$(BUILD_DIR)/sector.map -o $@ $^ -lgcc
 
 $(BUILD_DIR)/%.o: %.cpp ${HEADERS}
 	# gcc -ffreestanding -nostdlib -c -o $@ $<
-	g++ -c -m32 -ffreestanding -nostdlib -fno-pie  $< -o $@
+	g++ -c -m32 -ffreestanding -nostdlib -fno-pie  $< -o $@ -g -std=c++98
 
 
 $(BUILD_DIR)/%.o: %.asm

@@ -4,6 +4,8 @@
 #include "../drivers/disk.hpp"
 #include "../drivers/memory.hpp"
 
+#define min(a,b)    ((a) < (b) ? (a) : (b))
+#define max(a,b)    ((a) > (b) ? (a) : (b))
 // IMPLEMENTATION OF THE FAT FILESYSTEM
 extern "C" {
     // Description of an entry in the FAT filesystem
@@ -41,8 +43,8 @@ extern "C" {
     };
 
     bool FAT_Init(DISK *disk);
-    FAT_File FAT_Open(DISK *disk, const char *path);
     uint32_t FAT_Read(DISK *disk, FAT_File *file, uint32_t size, void *buffer);
     bool FAT_ReadEntry(DISK *disk, FAT_File *file, DirectoryEntry *entry);
     void FAT_Close(FAT_File *file);
 }
+    FAT_File *FAT_Open(DISK *disk, const char *path);

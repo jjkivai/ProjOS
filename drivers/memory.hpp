@@ -13,7 +13,11 @@
 
 
 extern "C" {
-    void *memcpy(void *dest, const void *src, uint16_t count);
-    void *memset(void *dest, uint8_t val, uint16_t count);
-    int memcmp(const void *s1, const void *s2, uint16_t count);
+    namespace memory
+    {
+        void *memcpy(void *dest, const void *src, uint16_t count);
+        void *memset(void *dest, uint8_t val, uint16_t count);
+        int memcmp(const void *s1, const void *s2, uint16_t count);
+    } // namespace memory
+    
 }
