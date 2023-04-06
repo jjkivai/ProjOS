@@ -17,8 +17,8 @@ extern "C" {
 class Display {
     private:
         /* Screen offsets*/
-        int offset_x;
-        int offset_y;
+        static int offset_x;
+        static int offset_y;
         /* Get location of cursor*/
         int get_cursor_offset() {
             port_byte_out(VGA_SCREEN_CTRL, 14); // Tell VGA screen we are sending high byte of cursor offset
@@ -37,14 +37,14 @@ class Display {
         }
         /* Set location of cursor */
         void set_cursor_offset(int x, int y) {
-            int offset = y * MAX_COLS + x;
+            int offset = 2*(y * MAX_COLS + x);
             set_cursor_offset(offset);
-            /*
-            port_byte_out(VGA_SCREEN_CTRL, 0x0F);
-            port_byte_out(VGA_SCREEN_DATA, (uint8_t)(pos & 0xFF));
-            port_byte_out(VGA_SCREEN_CTRL, 0x0E);
-            port_byte_out(VGA_SCREEN_DATA, (uint8_t)((pos >> 8) & 0xFF));
-            */
+            
+            //port_byte_out(VGA_SCREEN_CTRL, 0x0F);
+            //port_byte_out(VGA_SCREEN_DATA, (uint8_t)(offset & 0xFF));
+            //port_byte_out(VGA_SCREEN_CTRL, 0x0E);
+            //port_byte_out(VGA_SCREEN_DATA, (uint8_t)((offset >> 8) & 0xFF));
+            
         }
         /* Print character to screen */
         void set_char_at_video_memory(char character, int offset) {

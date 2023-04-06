@@ -66,8 +66,8 @@
 
 
 
-global Disk_GetDriveParams
-Disk_GetDriveParams:
+global Disk_GetDriveParameters
+Disk_GetDriveParameters:
     [bits 32]
 
     ; make new call frame
@@ -176,8 +176,8 @@ Disk_Reset:
     ret
 
 
-global Disk_Read
-Disk_Read:
+global Disk_ReadSectors
+Disk_ReadSectors:
 
     ; make new call frame
     push ebp             ; save old call frame

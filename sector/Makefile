@@ -4,6 +4,7 @@ C_SOURCES := $(wildcard *.cpp)
 C_SOURCES += $(wildcard ../drivers/*.cpp)
 
 ASM_SOURCES := $(wildcard *.asm)
+ASM_SOURCES += $(wildcard ../drivers/*.asm)
 
 C_OBJECTS := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(C_SOURCES))
 ASM_OBJECTS := $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SOURCES))

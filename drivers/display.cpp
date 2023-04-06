@@ -234,3 +234,5 @@ extern "C" {
     }
 
 }
+    int Display::offset_x = 0;
+    int Display::offset_y = 0;
