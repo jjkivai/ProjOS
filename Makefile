@@ -13,8 +13,8 @@ $(BUILD_DIR)/os_image.img: bootloader kernel
 	mkfs.fat -F 12 -n "PROJECTOS" $(BUILD_DIR)/os_image.img
 	dd if=$(BUILD_DIR)/record.bin of=$(BUILD_DIR)/os_image.img conv=notrunc
 	# cat $(BUILD_DIR)/sector.bin $(BUILD_DIR)/kernel.bin > $@
-	mcopy -i $(BUILD_DIR)/os_image.img $(BUILD_DIR)/sector.bin "::sector.bin"
 	mcopy -i $(BUILD_DIR)/os_image.img $(BUILD_DIR)/kernel.bin "::kernel.bin"
+	mcopy -i $(BUILD_DIR)/os_image.img $(BUILD_DIR)/sector.bin "::sector.bin"
 
 bootloader: record sector
 

@@ -8,7 +8,7 @@ extern __bss_start
 extern __end
 
 
-extern start
+extern _start
 global entry
 
 entry:
@@ -57,7 +57,7 @@ entry:
         mov dl, [g_BootDrive]
         push edx
 
-        call start
+        call _start
 
         cli
         hlt

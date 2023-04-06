@@ -9,6 +9,8 @@ ASM_SOURCES += $(wildcard ../drivers/*.asm)
 C_OBJECTS := $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(C_SOURCES))
 ASM_OBJECTS := $(patsubst %.asm, $(BUILD_DIR)/%.o, $(ASM_SOURCES))
 
+HEADERS := $(wildcard *.hpp)
+HEADERS += $(wildcard ../drivers/*.hpp)
 # OBJ_FILES := ${C_SOURCES:.cpp=$(BUILD_DIR)/%.o}
 
 .PHONY: all clean
@@ -18,12 +20,12 @@ all: run
 run: $(BUILD_DIR)/sector.bin
 
 $(BUILD_DIR)/sector.bin: $(C_OBJECTS) $(ASM_OBJECTS)
-	ld -m elf_i386 -Ttext 0x1000  --oformat binary -T linker.ld -o $@ $^ -Map $(BUILD_DIR)/sector.map 
-	# gcc -T linker.ld -nostdlib -Wl,-Map=$(BUILD_DIR)/sector.map -o $@ $^ -lgcc
+	#ld -m elf_i386 -Ttext 0x1000  --oformat binary -T linker.ld -o $@ $^ -Map $(BUILD_DIR)/sector.map 
+	g++ -m32 -ffreestanding -fno-pie -T linker.ld -nostdlib -Wl,-Ttext,0x1000 -Wl,--oformat=binary -Wl,-Map=$(BUILD_DIR)/sector.map -o $@ $^ -lgcc -std=c++2a 
 
 $(BUILD_DIR)/%.o: %.cpp ${HEADERS}
 	# gcc -ffreestanding -nostdlib -c -o $@ $<
-	g++ -c -m32 -ffreestanding -nostdlib -fno-pie  $< -o $@ -g -std=c++98
+	g++ -c -m32 -ffreestanding -nostdlib -fno-pie -fno-exceptions $< -o $@ -std=c++2a -lstdc++
 
 
 $(BUILD_DIR)/%.o: %.asm
