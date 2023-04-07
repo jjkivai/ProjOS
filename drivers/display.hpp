@@ -17,8 +17,8 @@ extern "C" {
 class Display {
     private:
         /* Screen offsets*/
-        static int offset_x;
-        static int offset_y;
+        int offset_x;
+        int offset_y;
         /* Get location of cursor*/
         int get_cursor_offset() {
             port_byte_out(VGA_SCREEN_CTRL, 14); // Tell VGA screen we are sending high byte of cursor offset
@@ -109,6 +109,8 @@ class Display {
             }
         }
     public:
+        /* Constructor */
+        Display();
         /* Print a string*/
         void print_string(const char *string, ...);
         /* Print string only */
@@ -123,7 +125,6 @@ class Display {
         void clear_screen();
         /* Print backspace */
         void backspace();
-
 
     };
 }

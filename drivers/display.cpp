@@ -25,7 +25,11 @@ extern "C" {
     #define LENGTH_LONG_LONG     4
 
 
-
+    Display::Display() {
+        int offset = get_cursor_offset();
+        offset_x = offset % (2 * MAX_COLS);
+        offset_y = offset / (2 * MAX_COLS);
+    }
     void Display::print_string(const char *string, ...) {
         va_list args;
         va_start(args, string);
@@ -234,5 +238,4 @@ extern "C" {
     }
 
 }
-    int Display::offset_x = 0;
-    int Display::offset_y = 0;
+

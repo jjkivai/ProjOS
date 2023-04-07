@@ -7,10 +7,10 @@ SECTIONS
     . = phys;
 
     .entry              : { __entry_start = .;      *(.entry)   }
-    .text               : { __text_start = .;       *(.text)    }
-    .data               : { __data_start = .;       *(.data)    }
-    .rodata             : { __rodata_start = .;     *(.rodata)  }
-    .bss                : { __bss_start = .;        *(.bss)     }
+    .text ALIGN(4k)              : { __text_start = .;       *(.text)    }
+    .data ALIGN(4k)                : { __data_start = .;       *(.data)    }
+    .rodata  ALIGN(4k)             : { __rodata_start = .;     *(.rodata)  }
+    .bss  ALIGN(4k)                : { __bss_start = .;        *(.bss)     }
     
     __end = .;
 }

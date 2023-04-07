@@ -1,7 +1,25 @@
 #include "disk.hpp"
-#include "ports.hpp"
+// #include "ports.hpp"
+
 
 extern "C" {
+    // Private prototypes
+    bool Disk_GetDriveParameters(uint8_t drive, 
+    uint8_t *driveType,
+    uint16_t *cylinders, 
+    uint16_t *sectors, 
+    uint16_t *heads);
+
+    bool Disk_Reset(uint8_t drive);
+
+    bool Disk_ReadSectors(uint8_t drive,
+    uint16_t cylinder,
+    uint16_t sector,
+    uint16_t head,
+    uint8_t count,
+    void* buffer);
+
+    
     bool Disk_Init(DISK *disk, uint8_t id) {
         uint8_t driveType;
         uint16_t cylinders, heads, sectors;

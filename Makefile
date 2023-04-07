@@ -1,7 +1,7 @@
 BUILD_DIR = $(abspath build)
 
 
-.PHONY: all os_image kernel bootloader clean always fat
+.PHONY: all os_image kernel bootloader clean always fat drivers
 
 all: os_image fat
 
@@ -27,13 +27,16 @@ $(BUILD_DIR)/record.bin: always
 
 sector: $(BUILD_DIR)/sector.bin
 
-$(BUILD_DIR)/sector.bin: always 
+$(BUILD_DIR)/sector.bin: always drivers
 	@echo "--> Compiled sector"
 	@$(MAKE) -C sector BUILD_DIR=$(abspath $(BUILD_DIR))
 
+drivers: always
+	@$(MAKE) -C drivers BUILD_DIR=$(abspath $(BUILD_DIR))
+
 kernel: $(BUILD_DIR)/kernel.bin
 
-$(BUILD_DIR)/kernel.bin: always
+$(BUILD_DIR)/kernel.bin: always drivers
 	@$(MAKE) -C kernel BUILD_DIR=$(abspath $(BUILD_DIR))
 
 
@@ -50,6 +53,7 @@ $(BUILD_DIR)/FAT/fat: always FAT/fat.c
 #
 always:
 	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/drivers
 
 clean:
 	$(MAKE) -C record clean BUILD_DIR=$(abspath $(BUILD_DIR))

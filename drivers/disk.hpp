@@ -13,4 +13,5 @@ extern "C" {
 
     bool Disk_Init(DISK *disk, uint8_t id);
     bool Disk_Read(DISK *disk, uint32_t lba, uint8_t sectors, void* buffer);
+    
 }

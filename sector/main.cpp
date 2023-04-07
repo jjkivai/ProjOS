@@ -7,13 +7,10 @@
 #include "fat.hpp"
 
 extern "C" {
-    void __attribute__((section(".entry"))) start(uint16_t bootDrive);
-}
-extern "C" {
     uint8_t* KernelLoadBuffer = (uint8_t*)MEMORY_LOAD_KERNEL;
     uint8_t* Kernel = (uint8_t*)MEMORY_KERNEL_ADDR;
 
-    typedef void (*KernelStart)();
+    typedef void (*KernelStart)(int);
 
     void __attribute__((cdecl)) _start(uint16_t bootDrive)
     {
@@ -46,8 +43,11 @@ extern "C" {
         FAT_Close(fd);
 
         // execute kernel
-        KernelStart kernelStart = (KernelStart)(Kernel + 0x1000);
-        kernelStart();
+        KernelStart kernelStart = (KernelStart)Kernel;
+
+        display.print_string("here\n");
+        kernelStart(bootDrive);
+
 
 
     } 
