@@ -17,37 +17,40 @@ extern "C" {
         Display display;
         display.clear_screen();
 
-        DISK disk;
-        if (!Disk_Init(&disk, bootDrive))
+        Disk::DISK disk;
+        if (!Disk::Init(&disk, bootDrive))
         {
             display.print_string("Disk init error\r\n");
         }
 
-        if (!FAT_Initialize(&disk))
+        if (!FAT::Initialize(&disk))
         {
             display.print_string("FAT init error\r\n");
         }
 
         // load kernel
-        FAT_File* fd = FAT_Open(&disk, "/kernel.bin");
+        FAT::FILE* fd = FAT::Open(&disk, "/kernel.bin");
         if(fd!= NULL) {
             display.print_string("Kernel has been found\n");
         }
         uint32_t read;
         uint8_t* kernelBuffer = Kernel;
-        while ((read = FAT_Read(&disk, fd, MEMORY_LOAD_SIZE, KernelLoadBuffer)))
+        while ((read = FAT::Read(&disk, fd, MEMORY_LOAD_SIZE, KernelLoadBuffer)))
         {
             memory::memcpy(kernelBuffer, KernelLoadBuffer, read);
             kernelBuffer += read;
         }
         display.print_string("Kernel has been loaded into memory\n");
-        FAT_Close(fd);
+        FAT::Close(fd);
 
         // execute kernel
         display.print_string("Starting kernel\n");
         KernelStart kernelStart = (KernelStart)Kernel;
         kernelStart(bootDrive);
 
+        display.print_string("Kernel has finished running\n"); // once kernel properly exits, we should never get here
+        display.print_string("Halting\n");
+        asm volatile("hlt");
 
 
     } 
