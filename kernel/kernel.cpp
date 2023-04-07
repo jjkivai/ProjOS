@@ -13,11 +13,13 @@ extern "C" {
 
         //clrscr();
         Display display;
-        display.clear_screen();
+        // display.clear_screen();
+        display.print_newline();
         display.print_newline();
         display.print_string("Hello world from kernel!!!\n");
+        display.print_string("Boot drive:%d\n", bootDrive);
         // display.print_newline();
         // for(;;);
-
+        return;
     }
 }

@@ -40,12 +40,12 @@ extern "C" {
             memory::memcpy(kernelBuffer, KernelLoadBuffer, read);
             kernelBuffer += read;
         }
+        display.print_string("Kernel has been loaded into memory\n");
         FAT_Close(fd);
 
         // execute kernel
+        display.print_string("Starting kernel\n");
         KernelStart kernelStart = (KernelStart)Kernel;
-
-        display.print_string("here\n");
         kernelStart(bootDrive);
 
 
