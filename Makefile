@@ -1,9 +1,9 @@
 BUILD_DIR = $(abspath build)
 
 
-.PHONY: all os_image kernel bootloader clean always fat drivers
+.PHONY: all os_image kernel bootloader clean always drivers
 
-all: os_image fat
+all: os_image
 
 os_image: $(BUILD_DIR)/os_image.img
 	qemu-system-i386 -drive format=raw,file=$<,index=0,if=floppy
@@ -40,13 +40,6 @@ $(BUILD_DIR)/kernel.bin: always drivers
 	@$(MAKE) -C kernel BUILD_DIR=$(abspath $(BUILD_DIR))
 
 
-#
-# Tools
-#
-fat: $(BUILD_DIR)/FAT/fat
-$(BUILD_DIR)/FAT/fat: always FAT/fat.c
-	mkdir -p $(BUILD_DIR)/tools
-	$(CC) -g -o $(BUILD_DIR)/tools/fat FAT/fat.c
 
 #
 # Always

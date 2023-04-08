@@ -1,16 +1,16 @@
 #include <stdint.h>
 #include "../drivers/display.hpp"
 #include "../drivers/memory.hpp"
+#include "kernelGDT.hpp"
 
 extern uint8_t __bss_start;
 extern uint8_t __end;
 
 extern "C" {
 
-    void start(uint16_t bootDrive)
-    {
-        memory::memset(&__bss_start, 0, (__end) - (__bss_start));
-
+    void start(uint16_t bootDrive) {
+        memory::memset(&__bss_start, 0, (&__end) - (&__bss_start));
+        GDT::Init();
         //clrscr();
         Display display;
         // display.clear_screen();
