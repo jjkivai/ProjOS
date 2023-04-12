@@ -12,9 +12,9 @@ extern "C" {
 
     typedef void (*KernelStart)(int);
 
-    void __attribute__((cdecl)) _start(uint16_t bootDrive)
+    void _start(uint16_t bootDrive)
     {
-        Display display;
+        Display display = Display::get_instance();
         display.clear_screen();
 
         Disk::DISK disk;
@@ -44,12 +44,8 @@ extern "C" {
         FAT::Close(fd);
 
         // execute kernel
-        display.print_string("Starting kernel\n");
         KernelStart kernelStart = (KernelStart)Kernel;
         kernelStart(bootDrive);
-
-        display.print_string("Kernel has finished running\n"); // once kernel properly exits, we should never get here
-        display.print_string("Halting\n");
         asm volatile("hlt");
 
 

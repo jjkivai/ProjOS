@@ -38,7 +38,10 @@ $(BUILD_DIR)/Interrupts:
 	mkdir -p $@
 
 always:
-	mkdir -p $(BUILD_DIR)/Interrupts
+	mkdir -p $(BUILD_DIR)/i686
+	mkdir -p $(BUILD_DIR)/hal
+	mkdir -p $(BUILD_DIR)/util
+	
 
 clean:
 	@rm -rf $(BUILD_DIR)/kernel.bin

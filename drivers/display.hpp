@@ -94,12 +94,14 @@ class Display {
         }
         /* Convert number to string*/
         void print_number(uint32_t number, int radix) {
+            static const char digits[] = "0123456789ABCDEF";
             char buffer[32];
             // Wok on printing hex numbers
             int pos=0, sign;
             if ((sign = number) < 0) number = -number;
             do {
-                buffer[pos++] = number % radix + '0';
+                // buffer[pos++] = number % radix + '0';
+                buffer[pos++] = digits[number % radix];
             } while((number /= radix) > 0);
 
             // Print in reverse order
@@ -125,6 +127,11 @@ class Display {
         void clear_screen();
         /* Print backspace */
         void backspace();
+        /* Get instance*/
+        static Display& get_instance() {
+            static Display instance;
+            return instance;
+        }
 
     };
 }
